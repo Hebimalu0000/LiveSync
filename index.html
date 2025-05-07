@@ -25,7 +25,8 @@
           }
 
           if (liff.isLoggedIn()) {
-            window.location.replace(location.href + "/connecting/");
+            console.log("Profile:",liff.getProfile())
+            //window.location.replace(location.href + "/connecting/");
           }
         })
         .catch((err) => {
