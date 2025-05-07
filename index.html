@@ -21,7 +21,7 @@
           console.log("LINE Version:", liff.getLineVersion());
 
           if (!liff.isLoggedIn()) {
-            liff.login();
+            liff.login({ redirectUri: "https://hebimalu0000.github.io/LiveSync/" });
           }
         })
         .catch((err) => {
