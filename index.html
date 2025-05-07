@@ -1,63 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 <head>
-  <title>Live Sync App</title>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <title>Live Sync</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      liff.init({
+        liffId: "2007377259-BNakP1g6"
+      })
+        .then(() => {
+          console.log("LIFF initialized");
+
+//          console.log("App Language:", liff.getAppLanguage());
+          console.log("LIFF Version:", liff.getVersion());
+          console.log("Is in LINE Client:", liff.isInClient());
+          console.log("Is Logged In:", liff.isLoggedIn());
+          console.log("OS:", liff.getOS());
+          console.log("LINE Version:", liff.getLineVersion());
+
+          if (!liff.isLoggedIn()) {
+            liff.login();
+          }
+        })
+        .catch((err) => {
+          console.error("LIFF init failed", err);
+        });
+    });
+  </script>
+
 </head>
 
 <body>
-  <div id="app-container">
-  </div>
-  <script src="script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', initializeApp);
-
-    async function initializeApp() {
-      try {
-        await liff.init({ liffId: '2007377259-BNakP1g6' });
-
-        if (!liff.isLoggedIn()) {
-          // 未ログインならログイン画面を表示
-          loadLoginScreen();
-        } else {
-          // ログイン済みなら待機画面を表示
-          loadWaitingScreen();
-          setupWebSocket(); // WebSocket接続の初期化
-        }
-
-      } catch (error) {
-        console.error('LIFF initialization failed:', error);
-        document.getElementById('app-container').innerText = 'LIFFの初期化に失敗しました。';
-      }
-    }
-
-    function loadLoginScreen() {
-      fetch('login.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('app-container').innerHTML = html;
-        })
-        .catch(error => console.error('Failed to load login screen:', error));
-    }
-
-    function loadWaitingScreen() {
-      fetch('waiting.html')
-        .then(response => response.text())
-        .then(html => {
-          document.getElementById('app-container').innerHTML = html;
-          const waitingScript = document.createElement('script');
-          waitingScript.src = 'waiting.js';
-          document.body.appendChild(waitingScript);
-        })
-        .catch(error => console.error('Failed to load waiting screen:', error));
-    }
-
-    // script.js に WebSocket の初期化やユーザー情報送信などの関数を記述
-  </script>
 </body>
 
 </html>
