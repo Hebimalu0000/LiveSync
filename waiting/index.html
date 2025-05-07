@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achex Live Sync</title>
+    <style>
+        #connection-info {
+            margin-bottom: 16px;
+        }
+
+        #auth-info {
+            margin-bottom: 8px;
+        }
+
+        #id {
+            width: 100%;
+            border: solid 1px #ccc;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        #msg {
+            width: 80%;
+            padding: 8px;
+        }
+
+        #send {
+            padding: 8px 16px;
+        }
+
+        #chat {
+            width: 100%;
+            height: 300px;
+            border: solid 1px #ccc;
+            overflow: auto;
+            padding: 8px;
+            margin-top: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
+</head>
+
+<body>
+    <div id="liff-status">
+        <p>LIFFアプリを初期化中です...</p>
+    </div>
+    <div id="connection-info" class="hidden">
+        <div id="auth-info"></div>
+        <div id="id"></div>
+    </div>
+    <div id="chat-input" class="hidden">
+        <input id="msg" type="text" value="" />
+        <button id="send" type="button">送信</button>
+    </div>
+    <div id="chat" class="hidden"></div>
+
+    <script src="script.js"></script>
+    <script>
+        let myDisplayName = null;
+        let isHost = false;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            liff.init({
+                liffId: "2007377261-n5qdLVMy" // ここにあなたのLIFF IDを入力してください
+            })
+                .then(() => {
+                    document.getElementById('liff-status').style.display = 'none';
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                    } else {
+                        liff.getProfile()
+                            .then(profile => {
+                                myDisplayName = profile.displayName;
+                                document.getElementById('id').innerHTML = 'ID (LINE Display Name) : ' + myDisplayName;
+                                document.getElementById('connection-info').classList.remove('hidden');
+                                document.getElementById('chat-input').classList.remove('hidden');
+                                document.getElementById('chat').classList.remove('hidden');
+
+                                const params = new URLSearchParams(window.location.search);
+                                const authParam = params.get('auth');
+                                const passwordParam = params.get('password');
+
+                                if (authParam && passwordParam) {
+                                    // 参加者として接続
+                                    connectChat(authParam, passwordParam, myDisplayName);
+                                    document.getElementById('auth-info').style.display = 'none'; // 参加者には認証情報を非表示
+                                } else {
+                                    // 配信者として認証情報を生成・表示
+                                    const auth = Math.random().toString(36).substring(2, 15);
+                                    const password = Math.random().toString(36).substring(2, 15);
+                                    document.getElementById('auth-info').innerHTML = '認証キー (Auth) : ' + auth + '<br>パスワード : ' + password;
+                                    connectChat(auth, password, myDisplayName); // 配信者も接続
+                                    isHost = true;
+                                }
+                                document.getElementById('send').addEventListener('click', sendChat);
+                            })
+                            .catch((err) => {
+                                console.error("プロフィールの取得に失敗しました:", err);
+                                document.getElementById('liff-status').innerHTML = 'プロフィールの取得に失敗しました。';
+                            });
+                    }
+                })
+                .catch((err) => {
+                    console.error("LIFFの初期化に失敗しました:", err);
+                    document.getElementById('liff-status').innerHTML = 'LIFFの初期化に失敗しました。';
+                });
+        });
+    </script>
+</body>
+
+</html>
