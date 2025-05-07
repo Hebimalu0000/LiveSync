@@ -23,6 +23,10 @@
           if (!liff.isLoggedIn()) {
             liff.login({ redirectUri: "https://hebimalu0000.github.io/LiveSync/" });
           }
+
+          if (liff.isLoggedIn()) {
+            window.location.replace(location.href + "/connecting/");
+          }
         })
         .catch((err) => {
           console.error("LIFF init failed", err);
